@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'mysql2'
+require 'csv'
 
 set :bind, '0.0.0.0'
 set :port, 8080
@@ -40,5 +41,7 @@ get '/end_turn' do
 end
 
 get '/unit_list' do
-   "UNIT LIST"
+   # read in ships.csv file
+   ships = CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol)
+   erb :unit_list, :locals => { :ships => ships}
 end
