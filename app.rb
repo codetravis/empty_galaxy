@@ -8,6 +8,25 @@ set :static, true
 set :public_folder, "static"
 set :views, "views"
 
+enable :sessions
+
+helpers do
+   
+   def login?
+      if session[:userid].nil?
+         return false
+      else
+         return true
+      end
+   end
+
+   def userid
+      return session[:userid]
+   end
+
+end
+
+
 get '/' do
    erb :index
 end
@@ -29,11 +48,25 @@ post '/login' do
    client = Mysql2::Client.new(:host => "localhost", 
       :database => "empty_galaxy", :username => "gameuser", :password => "test")
    user = client.query("SELECT userid FROM user WHERE email = '#{params[:email]}' and hashedpassword = '#{hashed_password}'").first
-   erb :account, :locals => {'userid' => user['userid'], 'email' => params[:email]}
+   if !user['userid']
+      redirect "/"
+   else
+      session[:userid] = user['userid']
+      erb :account, :locals => {'userid' => user['userid'], 'email' => params[:email]}
+   end
 end   
 
+get '/logout' do
+   # destroy cookies and sessions stuff
+   erb :index
+end
+
 get '/build_ship' do
-   erb :build_ship
+   if login?
+      erb :build_ship
+   else
+      redirect "/"
+   end
 end
 
 get '/end_turn' do
@@ -41,7 +74,20 @@ get '/end_turn' do
 end
 
 get '/unit_list' do
-   # read in ships.csv file
-   ships = CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol)
-   erb :unit_list, :locals => { :ships => ships}
+   if login?
+      # read in ships.csv file
+      ships = CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol)
+      erb :unit_list, :locals => { :ships => ships}
+   else
+      redirect "/"
+   end
+end
+
+post '/unit_list' do
+   client = Mysql2::Client.new(:host => "localhost", 
+      :database => "empty_galaxy", :username => "gameuser", :password => "test")
+   # get ship id from number of ships with userid in database
+   shipid = client.query("SELECT shipid FROM ship WHERE userid=#{params[:userid]}").count + 1
+   ship = client.query("INSERT INTO ship (shipid, userid, model) VALUES (#{shipid}, #{params[:userid]}, '#{params[:model]}')")
+   "#{shipid} #{params[:model]}"
 end
