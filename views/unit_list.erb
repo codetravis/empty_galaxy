@@ -1,7 +1,7 @@
 <div>
    <!-- list of ships that can be chosen -->
    <% ships.each do |ship| %>
-      <span style="cursor: pointer;" id="<%= ship[:model]%>" class="ship_model"><%= ship[:model] %></span><br/>
+      <span style="cursor: pointer;" id="<%= ship[:model]%>" class="ship_model" value="<%= ship[:model] %>"><%= ship[:model] %></span><br/>
       <!-- use an ajax call to create a ship in the database from this model -->
    <% end %>
 </div>

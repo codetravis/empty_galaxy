@@ -1,0 +1,25 @@
+<div>
+   <!-- list of ships that can be chosen -->
+   <table>
+   <thead>
+      <tr><td>Model</td><td>Cost</td><td>Power</td><td>Damage</td><td>Charge</td><td>Range</td></tr>
+   </thead>
+   <tbody>
+   <% turrets.each do |turret| %>
+      <tr>
+      <td>
+      <span style="cursor: pointer;" id="<%= turret[:model]%>" class="turret_model" ><%= turret[:model] %></span>
+      </td>
+      <td><%= turret[:cost] %></td>
+      <td><%= turret[:power] %></td>
+      <td><%= turret[:damage] %></td>
+      <td><%= turret[:charge] %></td>
+      <td><%= turret[:range] %></td>
+      </tr>
+   <% end %>
+   </tbody>
+   </table>
+</div>
+<div id="unit">
+
+</div>

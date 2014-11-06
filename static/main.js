@@ -6,6 +6,7 @@ $(document).ready(function() {
 
    $("#end_button").click(ChangePlayer);
    $(".ship_model").click(AddUnit);
+   $(".turret_model").click(AddTurret);
 
 });
 
@@ -26,12 +27,27 @@ function AddUnit() {
    $.ajax({
       url: "unit_list",
       data: {
-         model  : $(this).innerText,
-         userid : @Session["userid"]
+         'model'  : $(this).text()
       },
       type: 'POST',
       success: function(response) {
          $('#fleet').append("<div><p>" + response + "</p></div>");
+      },
+      error: function() {
+         alert("Ajax Error");
+      }
+   });
+}
+
+function AddTurret() {
+   $.ajax({
+      url: "build_unit",
+      data: {
+         'model'  : $(this).text()
+      },
+      type: 'POST',
+      success: function(response) {
+         $('#unit').append("<div><p>" + response + "</p></div>");
       },
       error: function() {
          alert("Ajax Error");

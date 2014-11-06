@@ -1,0 +1,3 @@
+model,cost,power,damage,range,charge
+Single Laser, 5, 5, beam, 2, 2
+Single Blaster, 5, 7, beam, 1, 2

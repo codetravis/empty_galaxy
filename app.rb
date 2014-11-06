@@ -61,12 +61,18 @@ get '/logout' do
    erb :index
 end
 
-get '/build_ship' do
+get '/build_unit' do
    if login?
-      erb :build_ship
+      # read in ships.csv file
+      turrets = CSV.read("game_data/turrets.csv", :headers => true, :header_converters => :symbol)
+      erb :build_unit, :locals => { :turrets => turrets}
    else
       redirect "/"
    end
+end
+
+post '/build_unit' do
+   "Add a turret to a ship"
 end
 
 get '/end_turn' do
@@ -87,7 +93,11 @@ post '/unit_list' do
    client = Mysql2::Client.new(:host => "localhost", 
       :database => "empty_galaxy", :username => "gameuser", :password => "test")
    # get ship id from number of ships with userid in database
-   shipid = client.query("SELECT shipid FROM ship WHERE userid=#{params[:userid]}").count + 1
-   ship = client.query("INSERT INTO ship (shipid, userid, model) VALUES (#{shipid}, #{params[:userid]}, '#{params[:model]}')")
-   "#{shipid} #{params[:model]}"
+   shipid = client.query("SELECT shipid FROM ship WHERE userid=#{userid}").count + 1
+   ship = client.query("INSERT INTO ship (shipid, userid, model) VALUES (#{shipid}, #{userid}, '#{params[:model]}')")
+   if params[:model].nil?
+      "No ship model given for some reason"
+   else
+      "#{shipid} #{params[:model]}"
+   end
 end

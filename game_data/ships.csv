@@ -1,4 +1,4 @@
-model, max_energy, recharge,  max_armor, max_shields, num_turrets, speed
-Frigate, 10, 5, 10, 10, 2, 3
-Cruiser, 25, 10, 15, 30, 5, 2
-Battleship, 50, 20, 40, 40, 7, 1
+model, cost, max_energy, recharge, max_armor, max_shields, num_turrets, speed
+Frigate, 5, 10, 5, 10, 10, 2, 3
+Cruiser, 10, 25, 10, 15, 30, 5, 2
+Battleship, 20, 50, 20, 40, 40, 7, 1
