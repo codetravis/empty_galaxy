@@ -15,11 +15,11 @@ player_turn int
 );
 
 CREATE TABLE IF NOT EXISTS ship (
-shipid int,
-userid int,
+shipid int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+userid int NOT NULL,
 gameid int,
 model varchar(255),
-direction varchar(6),
+direction int,
 position int,
 energy int,
 armor int,
@@ -27,7 +27,7 @@ shield int
 );
 
 CREATE TABLE IF NOT EXISTS turret (
-turretid int,
+turretid int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
 shipid int,
 model varchar(255),
 energy int

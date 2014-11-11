@@ -40,7 +40,7 @@ post '/register' do
    client = Mysql2::Client.new(:host => "localhost", 
       :database => "empty_galaxy", :username => "gameuser", :password => "test")
    client.query("INSERT INTO user (email, hashedpassword) VALUES ('#{params[:email]}', '#{hashed_password}')")
-   erb :index
+   redirect "/"
 end
 
 post '/login' do
@@ -61,7 +61,7 @@ get '/logout' do
    erb :index
 end
 
-get '/build_unit' do
+get '/build_unit/:shipid' do
    if login?
       # read in ships.csv file
       turrets = CSV.read("game_data/turrets.csv", :headers => true, :header_converters => :symbol)
@@ -71,8 +71,23 @@ get '/build_unit' do
    end
 end
 
-post '/build_unit' do
-   "Add a turret to a ship"
+post '/build_unit/:shipid' do
+   if login?
+      if not params[:shipid]
+         redirect "/unit_list"
+      end
+
+      client = Mysql2::Client.new(:host => "localhost", 
+         :database => "empty_galaxy", :username => "gameuser", :password => "test")
+      turret = client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
+      if params[:model].nil?
+         "No turret model given for some reason"
+      else
+         "#{turretid} #{params[:model]}"
+      end
+   else
+      redirect "/"
+   end
 end
 
 get '/end_turn' do
@@ -84,6 +99,7 @@ get '/unit_list' do
       # read in ships.csv file
       ships = CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol)
       erb :unit_list, :locals => { :ships => ships}
+      # also if fleet already exists, show ships in it (later subtract points of ships from total)
    else
       redirect "/"
    end
@@ -92,12 +108,10 @@ end
 post '/unit_list' do
    client = Mysql2::Client.new(:host => "localhost", 
       :database => "empty_galaxy", :username => "gameuser", :password => "test")
-   # get ship id from number of ships with userid in database
-   shipid = client.query("SELECT shipid FROM ship WHERE userid=#{userid}").count + 1
-   ship = client.query("INSERT INTO ship (shipid, userid, model) VALUES (#{shipid}, #{userid}, '#{params[:model]}')")
+   ship = client.query("INSERT INTO ship (userid, model) VALUES (#{userid}, '#{params[:model]}')")
    if params[:model].nil?
       "No ship model given for some reason"
    else
-      "#{shipid} #{params[:model]}"
+      "#{ship} #{params[:model]}"
    end
 end
