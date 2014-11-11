@@ -79,7 +79,7 @@ post '/build_unit/:shipid' do
 
       client = Mysql2::Client.new(:host => "localhost", 
          :database => "empty_galaxy", :username => "gameuser", :password => "test")
-      turret = client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
+      turretid = client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
       if params[:model].nil?
          "No turret model given for some reason"
       else

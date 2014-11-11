@@ -40,10 +40,10 @@ function AddUnit() {
 }
 
 function AddTurret() {
-   var url = window.location.href;
-   var shipid = url.substring(url.lastIndexOf('/') + 1);
+   var href = document.URL;
+   var shipid = href.split('build_unit/')[1];
    $.ajax({
-      url: "build_unit/" + shipid,
+      url: shipid,
       data: {
          'model'  : $(this).text()
       },
