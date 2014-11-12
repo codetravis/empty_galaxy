@@ -65,13 +65,16 @@ get '/build_unit/:shipid' do
    if login?
       # read in ships.csv file
       turrets = CSV.read("game_data/turrets.csv", :headers => true, :header_converters => :symbol)
-      erb :build_unit, :locals => { :turrets => turrets}
+      client = Mysql2::Client.new(:host => "localhost", 
+         :database => "empty_galaxy", :username => "gameuser", :password => "test")
+      current_turrets = client.query("SELECT * FROM turret WHERE shipid=#{params[:shipid]}", :symbolize_keys => true) 
+      erb :build_unit, :locals => { :turrets => turrets, :current_turrets => current_turrets}
    else
       redirect "/"
    end
 end
 
-post '/build_unit/:shipid' do
+post '/build_unit' do
    if login?
       if not params[:shipid]
          redirect "/unit_list"

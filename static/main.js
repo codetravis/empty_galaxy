@@ -41,11 +41,12 @@ function AddUnit() {
 
 function AddTurret() {
    var href = document.URL;
-   var shipid = href.split('build_unit/')[1];
+   var shipid = href.split('/').pop();
    $.ajax({
-      url: shipid,
+      url: "/build_unit",
       data: {
-         'model'  : $(this).text()
+         'model'  : $(this).text(),
+         'shipid' : shipid
       },
       type: 'POST',
       success: function(response) {

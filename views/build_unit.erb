@@ -21,5 +21,7 @@
    </table>
 </div>
 <div id="unit">
-
+   <% current_turrets.each do |turret| %>
+     <p><%= turret[:model] %></p>
+   <% end %>
 </div>
