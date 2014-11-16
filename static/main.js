@@ -24,6 +24,9 @@ function ChangePlayer() {
 }
 
 function AddUnit() {
+
+   $(".turret_model").click(AddTurret);
+   $(".ship_model").unbind("click");
    $.ajax({
       url: "unit_list",
       data: {
@@ -32,9 +35,11 @@ function AddUnit() {
       type: 'POST',
       success: function(response) {
          $('#fleet').append("<div><p>" + response + "</p></div>");
+         $(".ship_model").click(AddUnit);
       },
       error: function() {
          alert("Ajax Error");
+         $(".ship_model").click(AddUnit);
       }
    });
 }
@@ -42,6 +47,7 @@ function AddUnit() {
 function AddTurret() {
    var href = document.URL;
    var shipid = href.split('/').pop();
+   $(".turret_model").unbind("click");
    $.ajax({
       url: "/build_unit",
       data: {
@@ -51,9 +57,11 @@ function AddTurret() {
       type: 'POST',
       success: function(response) {
          $('#unit').append("<div><p>" + response + "</p></div>");
+         $(".turret_model").click(AddTurret);
       },
       error: function() {
          alert("Ajax Error");
+         $(".turret_model").click(AddTurret);
       }
    });
 }

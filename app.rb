@@ -79,15 +79,24 @@ post '/build_unit' do
       if not params[:shipid]
          redirect "/unit_list"
       end
-
       client = Mysql2::Client.new(:host => "localhost", 
          :database => "empty_galaxy", :username => "gameuser", :password => "test")
-      turretid = client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
-      if params[:model].nil?
-         "No turret model given for some reason"
+      ship = client.query("SELECT * FROM ship WHERE shipid=#{params[:shipid]}", :symbolize_keys => true).first
+      ships = Hash[CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol).map{ |x| [x[:model], x[:num_turrets]]}]
+      puts ship[:model]
+      puts ships
+      turret_count = client.query("SELECT * FROM turret WHERE shipid=#{params[:shipid]}").count 
+      if turret_count < ships[ship[:model]].to_i
+         turretid = client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
+         if params[:model].nil?
+            "No turret model given for some reason"
+         else
+            "#{turretid} #{params[:model]}"
+         end
       else
-         "#{turretid} #{params[:model]}"
+         "This ship has enough turrets already"
       end
+
    else
       redirect "/"
    end
@@ -101,7 +110,10 @@ get '/unit_list' do
    if login?
       # read in ships.csv file
       ships = CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol)
-      erb :unit_list, :locals => { :ships => ships}
+      client = Mysql2::Client.new(:host => "localhost",
+         :database => "empty_galaxy", :username => "gameuser", :password => "test")
+      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true);
+      erb :unit_list, :locals => { :ships => ships, :fleet => fleet}
       # also if fleet already exists, show ships in it (later subtract points of ships from total)
    else
       redirect "/"

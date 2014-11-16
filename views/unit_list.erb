@@ -24,5 +24,7 @@
    </table>
 </div>
 <div id="fleet">
-
+   <% fleet.each do |ship| %>
+      <p><a href="/build_unit/<%= ship[:shipid] %>"><%= ship[:shipid] %> <%= ship[:model] %></a></p>
+   <% end %>
 </div>
