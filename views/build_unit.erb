@@ -1,20 +1,34 @@
+<div id="options">
+   <form action="/unit_list" method="GET">
+      <button id="done_button" type="submit">Done</button>
+   </form>
+</div>
 <div>
    <!-- list of ships that can be chosen -->
    <table>
    <thead>
-      <tr><td>Model</td><td>Cost</td><td>Power</td><td>Damage</td><td>Charge</td><td>Range</td></tr>
+      <tr>
+         <td></td>
+         <td>Model</td>
+         <td>Cost</td>
+         <td>Power</td>
+         <td>Damage</td>
+         <td>Charge</td>
+         <td>Range</td>
+      </tr>
    </thead>
    <tbody>
    <% turrets.each do |turret| %>
       <tr>
-      <td>
-      <span style="cursor: pointer;" id="<%= turret[:model]%>" class="turret_model" ><%= turret[:model] %></span>
-      </td>
-      <td><%= turret[:cost] %></td>
-      <td><%= turret[:power] %></td>
-      <td><%= turret[:damage] %></td>
-      <td><%= turret[:charge] %></td>
-      <td><%= turret[:range] %></td>
+         <td><img src="/assets/images/<%= turret[:img] %>" /></td>
+         <td>
+         <span style="cursor: pointer;" id="<%= turret[:model]%>" class="turret_model" ><%= turret[:model] %></span>
+         </td>
+         <td><%= turret[:cost] %></td>
+         <td><%= turret[:power] %></td>
+         <td><%= turret[:damage] %></td>
+         <td><%= turret[:charge] %></td>
+         <td><%= turret[:range] %></td>
       </tr>
    <% end %>
    </tbody>

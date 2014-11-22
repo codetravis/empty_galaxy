@@ -2,15 +2,22 @@
    <!-- list of ships that can be chosen -->
    <table>
    <thead>
-      <tr><td>Model</td><td>Cost</td><td>Armor</td>
-          <td>Shields</td><td>Max Energy</td><td>Recharge</td>
-          <td># Turrets</td><td>Speed</td>
+      <tr>
+          <td></td>
+          <td>Model</td>
+          <td>Cost</td>
+          <td>Armor</td>
+          <td>Shields</td>
+          <td>Max Energy</td>
+          <td>Recharge</td>
+          <td># Turrets</td>
+          <td>Speed</td>
           </tr>
    </thead>
    <tbody>
    <% ships.each do |ship| %>
       <tr>
-         <td><span style="cursor: pointer;" id="<%= ship[:model]%>" class="ship_model" value="<%= ship[:model] %>"><%= ship[:model] %></span></td>
+         <td><img src="/assets/images/<%= ship[:img] %>"/></td><td><span style="cursor: pointer;" id="<%= ship[:model]%>" class="ship_model" value="<%= ship[:model] %>"><%= ship[:model] %></span></td>
          <td><%= ship[:cost] %></td>
          <td><%= ship[:max_armor] %></td>
          <td><%= ship[:max_shields] %></td>
