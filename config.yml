@@ -1,0 +1,4 @@
+db_host: localhost
+db_name: empty_galaxy
+db_user: gameuser
+db_password: test

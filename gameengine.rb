@@ -5,13 +5,26 @@ module Engine
 
    class Game
 
-      def initialize(gameid, map)
+      def initialize(gameid, map, settings)
          
+         @map = map
+
          # get the information about this game using its id from the db
-         client = Mysql2::Client.new(:host => db_host, :database => db_name,
-            :username => db_user, :password => db_password)
-         # make new map from the dimensions passed in
+         client = Mysql2::Client.new(:host => settings[:db_host],
+                                     :database => settings[:db_name],
+                                     :username => settings[:db_user], 
+                                     :password => settings[:db_password])
+         game = client.query("SELECT * FROM game WHERE gameid=#{gameid}",
+            :symbolize_keys => true);
+
+         # populate map from ship positions in database
+         ships = client.query("SELECT * FROM ship WHERE gameid=#{gameid}", 
+            :symbolize_keys => true);
+         ships.each { |ship|
+            @map.place_unit(ship[:position], ship[:shipid])
+         }
       end
+
    end
 
    class Map
@@ -57,17 +70,38 @@ module Engine
       end
    end
 
-   def quick_game(userid)
-      client = Mysql2::Client.new(:host => db_host, :database => db_name,
-         :username => db_user, :password => db_password)
+   def quick_game(userid, settings)
+      client = Mysql2::Client.new(:host => settings[:db_host],
+                                  :database => settings[:db_name],
+                                  :username => settings[:db_user], 
+                                  :password => settings[:db_password])
 
       # create new game in database
       client.query("INSERT INTO game (player_one, player_two) VALUES (#{userid}, 0)")
       gameid = client.last_id
-      # load ships/turrets from csv into array and then build into db
-      quick_list = CSV.read("game_data/quick_game.csv")
-      num_turrets = 0
-      
+      load_ship_list(gameid, userid, "quick_game.csv")
+      load_ship_list(gameid, 0, "quick_game.csv")
+
       # return gameid
+      return gameid
+   end
+
+   def load_ship_list(gameid, userid, filename)
+      client = Mysql2::Client.new(:host => settings[:db_host],
+                                  :database => settings[:db_name],
+                                  :username => settings[:db_user], 
+                                  :password => settings[:db_password])
+      # load ships/turrets from csv into array and then build into db
+      quick_list = CSV.read("game_data/" + filename)
+      shipid = 0
+      quick_list.each { |row|
+         if row[1] > 0
+            client.query("INSERT INTO ship (userid, gameid, model, direction, position, energy, armor, shield) VALUES (#{userid}, #{gameid}, #{row[0]}, 1, -1, 0, 0, 0)")
+            shipid = client.last_id
+         else
+            client.query("INSERT INTO turret (shipid, model, energy) VALUES (#{shipid}, #{row[0]}, 0)")
+         end
+      }
+
    end
 end
