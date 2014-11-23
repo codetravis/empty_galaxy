@@ -1,9 +1,23 @@
 // Initialize Phaser and create a 640x640 game
-var game = new Phaser.Game(640, 640, Phaser.CANVAS, 'game_div'
+var game = new Phaser.Game(640, 640, Phaser.CANVAS, 'game_div',
    { preload: preload, create: create, update: update });
 
 function preload() {
-
+   var href = document.URL;
+   var gameid = href.split('/').pop();
+   $.ajax({
+      url: "/gamestate",
+      data: {
+         'gameid' : gameid
+      },
+      dataType: "json",
+      type : 'GET',
+      success: function() {
+      },
+      error: function() {
+         
+      }
+   });
    // Change the background color of the game
    game.stage.backgroundColor = '#000000';
    
@@ -13,7 +27,7 @@ function preload() {
    game.load.image('battleship', '/assets/images/battleship.png');
 
    game.load.image('move_tile', '/assets/images/move_tile.png');
-   game.load.image('attack_tile', 'assets/images/attack_tile.png');
+   game.load.image('attack_tile', '/assets/images/attack_tile.png');
 }
 
 var BOARD_COLS = 10;

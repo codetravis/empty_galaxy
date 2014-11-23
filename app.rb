@@ -1,3 +1,4 @@
+$:.unshift File.dirname(__FILE__)
 require 'sinatra'
 require 'sinatra/content_for'
 require 'sinatra/config_file'
@@ -177,7 +178,7 @@ get '/game/:gameid' do
       game = client.query("SELECT * FROM game WHERE gameid=#{params[:gameid]}", :symbolize_keys => true)
       fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true)
       shipids = fleet.collect { |ship| ship[:shipid] }.join(", ")
-      turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})", symbolize_keys => true)
+      turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})", :symbolize_keys => true)
       erb :game, :locals => { :fleet => fleet, :turrets => turrets, :game => game }
    else
       redirect "/"
@@ -185,10 +186,28 @@ get '/game/:gameid' do
 
 end
 
+get '/gamestate' do
+   if login?
+      client = Mysql2::Client.new(:host => settings.db_host, 
+                               :database => settings.db_name,
+                               :username => settings.db_user,
+                               :password => settings.db_password)
+      game = client.query("SELECT * FROM game WHERE gameid=#{params[:gameid]}", :symbolize_keys => true)
+      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true)
+      shipids = fleet.collect { |ship| ship[:shipid] }.join(", ")
+      turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})", :symbolize_keys => true)
+      # return json data of game state
+      puts { :game => game, :fleet => fleet, :turrets => turrets }.to_json
+      return { :game => game, :fleet => fleet, :turrets => turrets }.to_json
+   else
+      redirect "/"
+   end
+end
+
 post '/quick_game' do
    if login?
       #set up a quick game against the AI
-      gameid = Engine::quick_game(userid, settings)
+      gameid = Engine.quick_game(userid, settings)
       redirect "/game/" + gameid.to_s
    else
       redirect "/"
