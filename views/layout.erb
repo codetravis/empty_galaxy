@@ -2,10 +2,14 @@
 <html>
 <head>
    <title>Space Game</title>
+   <link rel="stylesheet" type="text/css" href="/css/base.css"/>
+   <%= yield_content :style %>
    <script type="text/javascript" src="/js/jquery-2.1.1.js"></script>
-   <script type="text/javascript" src="/js/main.js"></script>
+   <%= yield_content :scripts %>
 </head>
 <body>
+   <div id="main_wrapper">
    <%= yield %>
+   </div>
 </body>
 </html>

@@ -1,7 +1,9 @@
+<% content_for :scripts do %>
+   <script type="text/javascript" src="/js/build_unit.js"></script>   
+<% end %>
+
 <div id="options">
-   <form action="/unit_list" method="GET">
-      <button id="done_button" type="submit">Done</button>
-   </form>
+   <a href="/unit_list"><button id="done_button" type="submit">Done</button></a>
 </div>
 <div>
    <!-- list of ships that can be chosen -->
@@ -20,10 +22,12 @@
    <tbody>
    <% turrets.each do |turret| %>
       <tr>
-         <td><img src="/assets/images/<%= turret[:img] %>" /></td>
          <td>
-         <span style="cursor: pointer;" id="<%= turret[:model]%>" class="turret_model" ><%= turret[:model] %></span>
+            <span style="cursor: pointer;" id="<%= turret[:model]%>" class="turret_model" >
+            <img src="/assets/images/<%= turret[:img] %>" />
+            </span>
          </td>
+         <td><%= turret[:model] %></td>
          <td><%= turret[:cost] %></td>
          <td><%= turret[:power] %></td>
          <td><%= turret[:damage] %></td>

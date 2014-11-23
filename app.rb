@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/content_for'
 require 'mysql2'
 require 'csv'
 
@@ -87,7 +88,8 @@ post '/build_unit' do
       puts ships
       turret_count = client.query("SELECT * FROM turret WHERE shipid=#{params[:shipid]}").count 
       if turret_count < ships[ship[:model]].to_i
-         turretid = client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
+         client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
+         turretid = client.last_id
          if params[:model].nil?
             "No turret model given for some reason"
          else
@@ -112,8 +114,10 @@ get '/unit_list' do
       ships = CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol)
       client = Mysql2::Client.new(:host => "localhost",
          :database => "empty_galaxy", :username => "gameuser", :password => "test")
-      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true);
-      erb :unit_list, :locals => { :ships => ships, :fleet => fleet}
+      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true)
+      game = client.query("SELECT gameid FROM game WHERE player_one=#{userid} OR player_two=#{userid}").first
+      puts game
+      erb :unit_list, :locals => { :ships => ships, :fleet => fleet, :gameid => game}
       # also if fleet already exists, show ships in it (later subtract points of ships from total)
    else
       redirect "/"
@@ -123,10 +127,50 @@ end
 post '/unit_list' do
    client = Mysql2::Client.new(:host => "localhost", 
       :database => "empty_galaxy", :username => "gameuser", :password => "test")
-   ship = client.query("INSERT INTO ship (userid, model) VALUES (#{userid}, '#{params[:model]}')")
-   if params[:model].nil?
-      "No ship model given for some reason"
+   client.query("INSERT INTO ship (userid, model) VALUES (#{userid}, '#{params[:model]}')")
+   ship = client.last_id
+   if params[:model].nil? or params[:model] == ""
+      "No ship model given for some reason: #{params[:model]}"
    else
-      "#{ship} #{params[:model]}"
+      "<a href=\"/build_unit/#{ship}\">#{ship} #{params[:model]}</a>"
+   end
+end
+
+
+get '/join_game' do
+
+end
+
+# page to start a game from
+get '/gameroom' do
+   if login?
+      erb :gameroom
+   else
+      redirect "/"
+   end
+end
+
+# render game
+get '/game/:gameid' do
+   if login?
+      # pass ships and turrets to page
+      client = Mysql::Client.new(:host => "localhost",
+         :database => "empty_galaxy", :username => "gameuser", :password => "text")
+      game = client.query("SELECT * FROM game WHERE gameid=#{params[:gameid]}", :symbolize_keys => true)
+      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true)
+      shipids = fleet.collect { |ship| ship[:shipid] }.join(", ")
+      turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})", symbolize_keys => true)
+      erb :game, :locals => { :fleet => fleet, :turrets => turrets, :game => game }
+   else
+      redirect "/"
+   end
+
+end
+
+post '/quick_game' do
+   if login?
+      #set up a quick game against the AI
+   else
+      redirect "/"
    end
 end

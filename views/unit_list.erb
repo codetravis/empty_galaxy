@@ -1,3 +1,7 @@
+<% content_for :scripts do %>
+   <script type="text/javascript" src="/js/unit_list.js"></script>
+<% end %>
+
 <div>
    <!-- list of ships that can be chosen -->
    <table>
@@ -17,7 +21,12 @@
    <tbody>
    <% ships.each do |ship| %>
       <tr>
-         <td><img src="/assets/images/<%= ship[:img] %>"/></td><td><span style="cursor: pointer;" id="<%= ship[:model]%>" class="ship_model" value="<%= ship[:model] %>"><%= ship[:model] %></span></td>
+         <td style="vertical-align: middle;">
+            <span style="cursor: pointer;" class="ship_model"  id="<%= ship[:model] %>">
+            <img src="/assets/images/<%= ship[:img] %>" />
+            </span>
+         </td>
+         <td><%= ship[:model] %></td>
          <td><%= ship[:cost] %></td>
          <td><%= ship[:max_armor] %></td>
          <td><%= ship[:max_shields] %></td>
@@ -34,4 +43,7 @@
    <% fleet.each do |ship| %>
       <p><a href="/build_unit/<%= ship[:shipid] %>"><%= ship[:shipid] %> <%= ship[:model] %></a></p>
    <% end %>
+</div>
+<div>
+   <a href="/gameroom"><button>Find a Battle</button></a>
 </div>

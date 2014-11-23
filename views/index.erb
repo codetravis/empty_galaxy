@@ -1,7 +1,12 @@
+<% content_for :scripts do %>
+   <script type="text/javascript" src="/js/main.js"></script>
+<% end %>
+
 <h1>SPACE GAME</h1>
+
 <div id="main_div">
-   <a href="register">Register</a><br/>
-   <form id="login" action="/login" method="post">
+   <a href="/register">Register</a><br/>
+   <form id="login" action="/login" method="POST">
       <label>Email
       <input type="email" name="email" />
       </label><br/>
@@ -10,9 +15,4 @@
       </label><br/>
       <input type="submit" value="Login" />
    </form>
-   <span id="end_button" style="cursor: pointer; text-decoration: underline">
-   END TURN
-   </span>
-   <div id="player_action">
-   </div>
 </div>
