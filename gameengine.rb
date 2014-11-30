@@ -93,10 +93,11 @@ module Engine
                                   :password => settings.db_password)
       # load ships/turrets from csv into array and then build into db
       quick_list = CSV.read("game_data/" + filename)
+      ship_data = Hash[CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol).map{ |x| [x[:model], x[:armor]]}]
       shipid = 0
       quick_list.each { |row|
          if row[1].to_i > 0
-            client.query("INSERT INTO ship (userid, gameid, model, direction, position, energy, armor, shield) VALUES (#{userid}, #{gameid}, '#{row[0]}', 1, -1, 0, 0, 0)")
+            client.query("INSERT INTO ship (userid, gameid, model, direction, position, energy, armor, shield) VALUES (#{userid}, #{gameid}, '#{row[0]}', 1, -1, 0, #{ship_data[row[0]].to_i}, 0)")
             shipid = client.last_id
          else
             client.query("INSERT INTO turret (shipid, model, energy) VALUES (#{shipid}, '#{row[0]}', 0)")

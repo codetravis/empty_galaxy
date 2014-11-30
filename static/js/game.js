@@ -12,10 +12,11 @@ function preload() {
       },
       dataType: "json",
       type : 'GET',
-      success: function() {
+      success: function(response) {
+         // create game data object
       },
       error: function() {
-         
+         // give error message
       }
    });
    // Change the background color of the game

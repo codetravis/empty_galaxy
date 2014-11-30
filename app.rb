@@ -4,6 +4,7 @@ require 'sinatra/content_for'
 require 'sinatra/config_file'
 require 'mysql2'
 require 'csv'
+require 'json'
 require 'gameengine'
 
 config_file 'config.yml'
@@ -117,10 +118,6 @@ post '/build_unit' do
    end
 end
 
-get '/end_turn' do
-   "ending turn for player"
-end
-
 get '/unit_list' do
    if login?
       # read in ships.csv file
@@ -151,11 +148,6 @@ post '/unit_list' do
    else
       "<a href=\"/build_unit/#{ship}\">#{ship} #{params[:model]}</a>"
    end
-end
-
-
-get '/join_game' do
-
 end
 
 # page to start a game from
@@ -197,7 +189,7 @@ get '/gamestate' do
       shipids = fleet.collect { |ship| ship[:shipid] }.join(", ")
       turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})", :symbolize_keys => true)
       # return json data of game state
-      puts { :game => game, :fleet => fleet, :turrets => turrets }.to_json
+      #puts { :game => game, :fleet => fleet, :turrets => turrets }
       return { :game => game, :fleet => fleet, :turrets => turrets }.to_json
    else
       redirect "/"
