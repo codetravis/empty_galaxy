@@ -72,6 +72,19 @@ get '/logout' do
    erb :index
 end
 
+get '/account' do
+   if login?
+      client = Mysql2::Client.new(:host => settings.db_host, 
+                                  :database => settings.db_name,
+                                  :username => settings.db_user,
+                                  :password => settings.db_password)
+      user = client.query("SELECT userid FROM user WHERE userid = #{userid}").first
+      erb :account, :locals => {'userid' => userid, 'email' => user['email'] }
+   else
+      redirect "/"
+   end
+end
+
 get '/build_unit/:shipid' do
    if login?
       # read in ships.csv file
@@ -184,13 +197,13 @@ get '/gamestate' do
                                :database => settings.db_name,
                                :username => settings.db_user,
                                :password => settings.db_password)
-      game = client.query("SELECT * FROM game WHERE gameid=#{params[:gameid]}", :symbolize_keys => true)
-      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true)
-      shipids = fleet.collect { |ship| ship[:shipid] }.join(", ")
-      turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})", :symbolize_keys => true)
+      game = client.query("SELECT * FROM game WHERE gameid=#{params[:gameid]}")
+      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid} and gameid = #{params[:gameid]}")
+      shipids = fleet.collect { |ship| ship['shipid'] }.join(", ")
+      turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})")
       # return json data of game state
-      #puts { :game => game, :fleet => fleet, :turrets => turrets }
-      return { :game => game, :fleet => fleet, :turrets => turrets }.to_json
+      puts ({ :game => game.to_a, :fleet => fleet.to_a, :turrets => turrets.to_a }.to_json)
+      return { :game => game.to_a, :fleet => fleet.to_a, :turrets => turrets.to_a }.to_json
    else
       redirect "/"
    end

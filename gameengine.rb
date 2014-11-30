@@ -93,7 +93,7 @@ module Engine
                                   :password => settings.db_password)
       # load ships/turrets from csv into array and then build into db
       quick_list = CSV.read("game_data/" + filename)
-      ship_data = Hash[CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol).map{ |x| [x[:model], x[:armor]]}]
+      ship_data = Hash[CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol).map{ |x| [x[:model], x[:max_armor]]}]
       shipid = 0
       quick_list.each { |row|
          if row[1].to_i > 0
