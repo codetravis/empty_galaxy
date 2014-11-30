@@ -95,9 +95,10 @@ module Engine
       quick_list = CSV.read("game_data/" + filename)
       ship_data = Hash[CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol).map{ |x| [x[:model], x[:max_armor]]}]
       shipid = 0
+      pos_modifier = (userid == 0) ? 0 : 90
       quick_list.each { |row|
          if row[1].to_i > 0
-            client.query("INSERT INTO ship (userid, gameid, model, direction, position, energy, armor, shield) VALUES (#{userid}, #{gameid}, '#{row[0]}', 1, -1, 0, #{ship_data[row[0]].to_i}, 0)")
+            client.query("INSERT INTO ship (userid, gameid, model, direction, position, energy, armor, shield) VALUES (#{userid}, #{gameid}, '#{row[0]}', 1, #{shipid % 5 + pos_modifier}, 0, #{ship_data[row[0]].to_i}, 0)")
             shipid = client.last_id
          else
             client.query("INSERT INTO turret (shipid, model, energy) VALUES (#{shipid}, '#{row[0]}', 0)")

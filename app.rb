@@ -198,7 +198,7 @@ get '/gamestate' do
                                :username => settings.db_user,
                                :password => settings.db_password)
       game = client.query("SELECT * FROM game WHERE gameid=#{params[:gameid]}")
-      fleet = client.query("SELECT * FROM ship WHERE userid=#{userid} and gameid = #{params[:gameid]}")
+      fleet = client.query("SELECT * FROM ship WHERE gameid = #{params[:gameid]}")
       shipids = fleet.collect { |ship| ship['shipid'] }.join(", ")
       turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})")
       # return json data of game state

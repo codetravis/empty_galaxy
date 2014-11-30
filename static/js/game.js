@@ -50,7 +50,10 @@ function setupBoard(game_info) {
    turrets = game_info["turrets"]
    for(var i=0; i < fleet.length; i++)  {
       var obj = fleet[i];
-      this_ship = ships.create(i * 64 + 32, i * 64 + 32, obj["model"]);
+      console.log(obj["position"]);
+      var y = Math.floor(obj["position"] / 10) * 64 + 32; // how many spots from top
+      var x = (obj["position"] % 10) * 64 + 32; // how may spots from left
+      this_ship = ships.create(x, y, obj["model"]);
       this_ship.anchor.set(0.5);
       this_ship.armor = obj["armor"];
       this_ship.shields = obj["shields"];
