@@ -214,3 +214,35 @@ post '/quick_game' do
       redirect "/"
    end
 end
+
+# function called at the beginning of the updated function to see if it is this players turn or not
+get '/checkturn' do
+   if login?
+      client = Mysql2::Client.new(:host => settings.db_host, 
+                               :database => settings.db_name,
+                               :username => settings.db_user,
+                               :password => settings.db_password)
+      gameid = params[:gameid]
+      player_turn = client.query("SELECT player_turn FROM game WHERE gameid=#{gameid}").first
+      return player_turn[0]
+   else
+      redirect "/"
+   end
+end
+
+# function called by the end turn action of the player
+post '/endturn' do
+   if login?
+      client = Mysql2::Client.new(:host => settings.db_host, 
+                               :database => settings.db_name,
+                               :username => settings.db_user,
+                               :password => settings.db_password)
+      gameid = params[:gameid]
+      gamestate = client.query("SELECT * FROM game WHERE gameid=#{gameid}", :symbolize_keys => true).first
+      turn = (gamestate[:player_turn] == gamestate[:player_one]) ? gamestate[:player_two] : gamestate[:player_one]
+      client.query("UPDATE game SET player_turn = #{turn} WHERE gameid=#{gameid}")
+   else
+      redirect "/"
+   end
+end
+

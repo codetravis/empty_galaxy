@@ -18,15 +18,16 @@ function preload() {
 var BOARD_COLS = 10;
 var BOARD_ROWS = 10;
 var SHIP_SIZE  = 64;
+var TURN       = 0;
+var GAMEID = document.URL.split('/').pop();
+var USERID = 0; // need to get user id from hidden page field
 
 function create() {
    // Function called after 'preload' to set up the game
-   var href = document.URL;
-   var gameid = href.split('/').pop();
    $.ajax({
       url: "/gamestate",
       data: {
-         'gameid' : gameid
+         'gameid' : GAMEID
       },
       dataType: "json",
       type : 'GET',
@@ -40,6 +41,20 @@ function create() {
 
 function update() {
    // get updates on game from server and modify the map on move
+   // check if it is my turn
+   if (TURN != "0") {
+      TURN = getTurn();
+   }
+
+   console.log(TURN);
+   // if it is, lets take our turn
+
+   // phase1 -- charge shields and weapons
+
+   // phase2 -- move
+
+   // phase3 -- attack
+
 }
 
 function setupBoard(game_info) {
@@ -58,4 +73,19 @@ function setupBoard(game_info) {
       this_ship.shields = obj["shields"];
       this_ship.direction = obj["direction"];
    }
+}
+
+function getTurn() {
+   var myturn = "";
+   $.ajax({
+      url: '/checkturn',
+      data: {
+         'gameid' : GAMEID
+      },
+      dataType: 'text',
+      type: 'GET',
+      success: function(data) {myturn = data},
+      error: function() {}
+   });
+   return myturn
 }
