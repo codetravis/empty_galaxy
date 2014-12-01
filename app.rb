@@ -111,8 +111,6 @@ post '/build_unit' do
                                :password => settings.db_password)
       ship = client.query("SELECT * FROM ship WHERE shipid=#{params[:shipid]}", :symbolize_keys => true).first
       ships = Hash[CSV.read("game_data/ships.csv", :headers => true, :header_converters => :symbol).map{ |x| [x[:model], x[:num_turrets]]}]
-      puts ship[:model]
-      puts ships
       turret_count = client.query("SELECT * FROM turret WHERE shipid=#{params[:shipid]}").count 
       if turret_count < ships[ship[:model]].to_i
          client.query("INSERT INTO turret (shipid, model) VALUES (#{params[:shipid]}, '#{params[:model]}')")
@@ -141,7 +139,6 @@ get '/unit_list' do
                                :password => settings.db_password)
       fleet = client.query("SELECT * FROM ship WHERE userid=#{userid}", :symbolize_keys => true)
       game = client.query("SELECT gameid FROM game WHERE player_one=#{userid} OR player_two=#{userid}").first
-      puts game
       erb :unit_list, :locals => { :ships => ships, :fleet => fleet, :gameid => game}
       # also if fleet already exists, show ships in it (later subtract points of ships from total)
    else
@@ -202,7 +199,6 @@ get '/gamestate' do
       shipids = fleet.collect { |ship| ship['shipid'] }.join(", ")
       turrets = client.query("SELECT * FROM turret WHERE shipid IN (#{shipids})")
       # return json data of game state
-      puts ({ :game => game.to_a, :fleet => fleet.to_a, :turrets => turrets.to_a }.to_json)
       return { :game => game.to_a, :fleet => fleet.to_a, :turrets => turrets.to_a }.to_json
    else
       redirect "/"

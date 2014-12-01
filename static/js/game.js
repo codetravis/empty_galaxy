@@ -3,8 +3,6 @@ var this_game = new Phaser.Game(640, 640, Phaser.CANVAS, 'game_div',
    { preload: preload, create: create, update: update });
 
 function preload() {
-   var href = document.URL;
-   var gameid = href.split('/').pop();
    // Change the background color of the game
    this_game.stage.backgroundColor = '#000000';
    
@@ -15,6 +13,16 @@ function preload() {
 
    this_game.load.image('move_tile', '/assets/images/move_tile.png');
    this_game.load.image('attack_tile', '/assets/images/attack_tile.png');
+}
+
+var BOARD_COLS = 10;
+var BOARD_ROWS = 10;
+var SHIP_SIZE  = 64;
+
+function create() {
+   // Function called after 'preload' to set up the game
+   var href = document.URL;
+   var gameid = href.split('/').pop();
    $.ajax({
       url: "/gamestate",
       data: {
@@ -27,14 +35,6 @@ function preload() {
          // give error message
       }
    });
-}
-
-var BOARD_COLS = 10;
-var BOARD_ROWS = 10;
-var SHIP_SIZE  = 64;
-
-function create() {
-   // Function called after 'preload' to set up the game
 
 }
 
@@ -50,7 +50,6 @@ function setupBoard(game_info) {
    turrets = game_info["turrets"]
    for(var i=0; i < fleet.length; i++)  {
       var obj = fleet[i];
-      console.log(obj["position"]);
       var y = Math.floor(obj["position"] / 10) * 64 + 32; // how many spots from top
       var x = (obj["position"] % 10) * 64 + 32; // how may spots from left
       this_ship = ships.create(x, y, obj["model"]);
