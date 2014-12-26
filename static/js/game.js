@@ -1,6 +1,6 @@
 // Initialize Phaser and create a 640x640 game
 var this_game = new Phaser.Game(640, 640, Phaser.CANVAS, 'game_div',
-   { preload: preload, create: create, update: update });
+   { preload: preload, create: create });
 
 function preload() {
    // Change the background color of the game
@@ -18,12 +18,14 @@ function preload() {
 var BOARD_COLS = 10;
 var BOARD_ROWS = 10;
 var SHIP_SIZE  = 64;
-var TURN       = 0;
+var TURN       = 1;
 var GAMEID = document.URL.split('/').pop();
 var USERID = 0; // need to get user id from hidden page field
 
 function create() {
    // Function called after 'preload' to set up the game
+   $('#end_turn').click(endTurn);
+   $('#check_turn').click(getTurn);
    $.ajax({
       url: "/gamestate",
       data: {
@@ -36,24 +38,6 @@ function create() {
          // give error message
       }
    });
-
-}
-
-function update() {
-   // get updates on game from server and modify the map on move
-   // check if it is my turn
-   if (TURN != "0") {
-      TURN = getTurn();
-   }
-
-   console.log(TURN);
-   // if it is, lets take our turn
-
-   // phase1 -- charge shields and weapons
-
-   // phase2 -- move
-
-   // phase3 -- attack
 
 }
 
@@ -72,11 +56,13 @@ function setupBoard(game_info) {
       this_ship.armor = obj["armor"];
       this_ship.shields = obj["shields"];
       this_ship.direction = obj["direction"];
+      this_ship.userid = obj["userid"];
    }
+   TURN = game[0]["player_turn"]
+   console.log("setup: " + TURN)
 }
 
 function getTurn() {
-   var myturn = "";
    $.ajax({
       url: '/checkturn',
       data: {
@@ -84,8 +70,30 @@ function getTurn() {
       },
       dataType: 'text',
       type: 'GET',
-      success: function(data) {myturn = data},
-      error: function() {}
+      success: function(data) {
+         TURN = data;
+         console.log("data was: " + data);
+         console.log("getTurn: " + TURN);
+      },
+      error: function() {console.log("error in getTurn");}
    });
-   return myturn
+   // if turn is my turn, hide check turn and show end turn
+   // then start the logic to take me through my turn
+   // otherwise do nothing
+}
+
+function endTurn() {
+
+   $.ajax({
+      url: "/endturn",
+      data: {
+         'gameid' : GAMEID
+      },
+      dataType: "text",
+      type : 'POST',
+      success: function(data){getTurn()},
+      error: function() {
+         // give error message
+      }
+   });
 }
