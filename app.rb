@@ -5,6 +5,7 @@ require 'sinatra/config_file'
 require 'mysql2'
 require 'csv'
 require 'json'
+require 'models'
 require 'gameengine'
 
 config_file 'config.yml'
