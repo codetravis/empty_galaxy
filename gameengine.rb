@@ -7,12 +7,21 @@ module GameEngine
 
    class ActiveGame
       def initialize(gameid)
-         @map = Array.new(10, Array.new(10, 0))
+         @map = Array.new(10) {Array.new(10, 0)}
+         @game = Models::Game.first(:gameid => gameid)
+         # get ids of players in the game
+         @players = [@game.player_one, @game.player_two]
 
          # populate map with ships connected to players in game
+         @ships = Models::Ship.all(:gameid => gameid, :userid => @players).to_a
+         @ships.each do |ship|
+            @map[ship.yposition][ship.xposition] = ship.shipid
+            puts "#{ship.shipid} #{ship.yposition} #{ship.xposition}"
+         end
+
       end
       
-      attr_reader :map
+      attr_reader :map, :game, :players, :ships
 
    end
 
